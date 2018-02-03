@@ -14,6 +14,17 @@
 #' @param digits The number of significant digits to show
 #' @param outcome The comparison variable, divides the data into categories
 #'
+#' @examples
+#'
+#' data(mtcars)
+#'
+#' meansd(mtcars$mpg)
+#'
+#' with(mtcars, groupMeans(mpg, am))
+#'
+#' am <- plyr::mapvalues(mtcars$am, c(0, 1), c("Auto", "Manual"))
+#' groupMeans(mtcars$mpg, am)
+#'
 #' @export
 meansd <- function(var, na.rm = TRUE, varname = NULL, digits = 2) {
     if (is.null(varname)) {
@@ -56,7 +67,7 @@ groupMeans <- function(var, outcome, digits = 2) {
     varname <- as.character(substitute(var))
     varname <- varname[[length(varname)]]
     stopifnot(S4Vectors::isSingleString(varname))
-
+    outcome <- as.factor(outcome)
     var <- as.numeric(var)
     splitSet <- split(var, outcome)
     ## Enforce levels

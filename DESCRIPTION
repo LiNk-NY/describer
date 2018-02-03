@@ -1,11 +1,13 @@
 Package: describer
 Title: Produce small summaries of data
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: person("Marcel", "Ramos", email = "marcel.ramos@roswellpark.org",
     role = c("aut", "cre"))
 Description: The describer package produces crosstabs, mean tables,
     proportions for vector data.
 Depends: R (>= 3.5.0)
+Suggests:
+    plyr
 License: Artistic-2.0
 Encoding: UTF-8
 LazyData: true
