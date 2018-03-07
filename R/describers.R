@@ -16,6 +16,12 @@
 #' @param ... Variables to describe by the outcome, can be verctors or
 #' unquoted names when the data argument is supplied
 #' @param data A data.frame containing the comparison variables
+#' @param headerRow A character vector for each variable in \ldots that serves
+#' as the descriptive name in the table
+#' @param headerFrame A data.frame that relates or maps each variable name
+#' to its respective descriptive name
+#' @param includeHeaders logical (default TRUE) indicating whether or not
+#' to add a header row to the table with group counts for the outcome variable
 #'
 #' @examples
 #'

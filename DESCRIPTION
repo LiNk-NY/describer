@@ -1,6 +1,6 @@
 Package: describer
 Title: Produce small summaries of data
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: person("Marcel", "Ramos", email = "marcel.ramos@sph.cuny.edu",
     role = c("aut", "cre"))
 Description: The describer package produces crosstabs, mean tables,

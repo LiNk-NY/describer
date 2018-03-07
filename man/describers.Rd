@@ -44,6 +44,15 @@ numeric values}
 unquoted names when the data argument is supplied}
 
 \item{data}{A data.frame containing the comparison variables}
+
+\item{headerRow}{A character vector for each variable in \ldots that serves
+as the descriptive name in the table}
+
+\item{headerFrame}{A data.frame that relates or maps each variable name
+to its respective descriptive name}
+
+\item{includeHeaders}{logical (default TRUE) indicating whether or not
+to add a header row to the table with group counts for the outcome variable}
 }
 \description{
 These functions work on character, numeric, or factor
