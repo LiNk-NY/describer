@@ -1,4 +1,4 @@
-#' @rdname describers
+#' @name describers
 #'
 #' @title A collection of functions to summarize vectors in matrix format
 #'
@@ -28,6 +28,9 @@
 #' am <- plyr::mapvalues(mtcars$am, c(0, 1), c("Auto", "Manual"))
 #' groupMeans(mtcars$mpg, am)
 #'
+NULL
+
+#' @name describers
 #' @export
 meansd <- function(var, na.rm = TRUE, varname = NULL, digits = 2) {
     if (is.null(varname)) {
@@ -42,6 +45,7 @@ meansd <- function(var, na.rm = TRUE, varname = NULL, digits = 2) {
         dimnames = list(varname, "M (SD)"))
 }
 
+#' @name describers
 #' @export
 proportion <- function(var, digits = 1) {
     if (is.data.frame(var))
@@ -52,6 +56,7 @@ proportion <- function(var, digits = 1) {
     matrix(vals, ncol = 1, dimnames = list(names(table(var)), "n (%)"))
 }
 
+#' @name describers
 #' @export
 crosstab <- function(var, var2, digits = 2) {
     if (is.data.frame(var))
@@ -65,6 +70,7 @@ crosstab <- function(var, var2, digits = 2) {
     matrix(vals, ncol = 2, dimnames = crossnames)
 }
 
+#' @name describers
 #' @export
 groupMeans <- function(var, outcome, digits = 2) {
     varname <- as.character(substitute(var))
@@ -85,6 +91,8 @@ groupMeans <- function(var, outcome, digits = 2) {
     resMat[, rev(groupNames), drop = FALSE]
 }
 
+#' @name describers
+#' @export
 describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
     includerHeader = TRUE, deparse.level = 2, digits = 2)
 {
