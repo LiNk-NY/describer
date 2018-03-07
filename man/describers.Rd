@@ -20,8 +20,25 @@ numeric values}
 \item{var2}{A second categorical variable for crosstabulation}
 
 \item{outcome}{The comparison variable, divides the data into categories}
+
+\item{...}{Variables to describe by the outcome, can be verctors or
+unquoted names when the data argument is supplied}
+
+\item{data}{A data.frame containing the comparison variables}
 }
 \description{
 These functions work on character, numeric, or factor
 vectors. They are meant to make outputs easier to paste into table.
+}
+\examples{
+
+data(mtcars)
+
+meansd(mtcars$mpg)
+
+with(mtcars, groupMeans(mpg, am))
+
+am <- plyr::mapvalues(mtcars$am, c(0, 1), c("Auto", "Manual"))
+groupMeans(mtcars$mpg, am)
+
 }

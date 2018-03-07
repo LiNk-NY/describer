@@ -13,6 +13,9 @@
 #' (defaults to object name)
 #' @param digits The number of significant digits to show
 #' @param outcome The comparison variable, divides the data into categories
+#' @param ... Variables to describe by the outcome, can be verctors or
+#' unquoted names when the data argument is supplied
+#' @param data A data.frame containing the comparison variables
 #'
 #' @examples
 #'
@@ -80,4 +83,78 @@ groupMeans <- function(var, outcome, digits = 2) {
     }, character(1L), x = splitSet)
     resMat <- matrix(res, nrow = 1L, dimnames = list(varname, groupNames))
     resMat[, rev(groupNames), drop = FALSE]
+}
+
+describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
+    includerHeader = TRUE, deparse.level = 2, digits = 2)
+{
+    listvars <- as.list(substitute(list(...)))[-1L]
+    ## code from table()
+    nams <- vapply(listvars, function(x) {
+        switch(deparse.level + 1L,
+               "", if (is.symbol(x)) as.character(x) else "",
+               gsub("\\w+\\$", "", deparse(x, nlines = 1L)[1L]))
+    }, character(1L))
+
+    outname <- rev(as.character(substitute(outcome)))[1L]
+    if (!missing(data)) {
+        args <- as.list(data[, nams])
+        if (length(outname) == 1L)
+            outcome <- data[, outname]
+        else
+            stop("Provide a single outcome")
+    } else {
+        args <- list(...)
+    }
+    if (!is.factor(outcome))
+        outcome <- as.factor(outcome)
+    lengthArgs <- seq_along(args)
+
+    if (!is.null(headerRow))
+        names(lengthArgs) <- names(args) <- headerRow
+    else if (!is.null(headerFrame))
+        names(lengthArgs) <- names(args) <- headerRow <-
+        headerFrame[[2L]][match(nams, headerFrame[[1L]])]
+    else
+        names(lengthArgs) <- names(args) <- nams
+
+    outlevels <- rownames(contrasts(outcome))
+    headrow <- if (includerHeader) {
+        list(matrix(
+            c("", paste0("n = ", table(outcome)[outlevels]), ""), nrow = 1L,
+            dimnames = list("Characteristic", c("n (%)",
+            paste(outname, outlevels, sep = "-"), "p.value"))
+        ))
+    } else {
+        NULL
+    }
+
+    numeric <- vapply(args, is.numeric, logical(1L))
+    results <- lapply(lengthArgs, function(i, x, compVar) {
+        vari <- x[[i]]
+        if (is.data.frame(vari))
+            vari <- vari[[1L]]
+        if (is.character(vari))
+            vari <- as.factor(vari)
+        if (numeric[[i]]) {
+            cbind(.meansd(vari, varName = names(x[i]), digits = digits),
+                  .groupMeans(vari, compVar, digits = digits),
+                  .ttestPval(vari, compVar, varName = names(x[i])))
+        } else {
+            fourth <- .chitestPval(vari, compVar)[[1L]]
+            if (!is.null(headerRow)) {
+                header <- matrix(c(rep("", 3L), fourth), nrow = 1L,
+                                 dimnames = list(headerRow[[i]], NULL))
+                p.value <- rep("", length(levels(vari)))
+            } else {
+                header <- character(0L)
+                p.value <- c(fourth, rep("", length(levels(vari))-1))
+            }
+            rbind(header,
+                  cbind(.prop(vari, digits = digits),
+                        .crossTab(vari, compVar, digits = digits),
+                        p.value))
+        }
+    }, compVar = outcome, x = args)
+    c(headrow, results)
 }
