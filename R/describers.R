@@ -90,6 +90,7 @@ groupMeans <- function(var, outcome, digits = 2) {
     varname <- as.character(substitute(var))
     varname <- varname[[length(varname)]]
     stopifnot(S4Vectors::isSingleString(varname))
+    outcome <- as.factor(outcome)
 
     var <- as.numeric(var)
     splitSet <- split(var, outcome)
@@ -101,7 +102,7 @@ groupMeans <- function(var, outcome, digits = 2) {
         std <- round(sd(x[[i]], na.rm = TRUE), digits)
         paste0(m, " (", std, ")")
     }, character(1L), x = splitSet)
-    resMat <- matrix(res, nrow = 1L, dimnames = list(varname, groupNames))
+    matrix(res, nrow = 1L, dimnames = list(varname, groupNames))
 }
 
 #' @name describers
