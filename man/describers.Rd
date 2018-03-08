@@ -63,10 +63,18 @@ vectors. They are meant to make outputs easier to paste into table.
 data(mtcars)
 
 meansd(mtcars$mpg)
+proportion(mtcars$gear)
 
 with(mtcars, groupMeans(mpg, am))
 
 am <- plyr::mapvalues(mtcars$am, c(0, 1), c("Auto", "Manual"))
+mtcars$vs1 <- plyr::mapvalues(mtcars$vs, c(0, 1), c("V Engine", "Straight"))
+
 groupMeans(mtcars$mpg, am)
+
+crosstab(mtcars$vs1, am)
+
+mtcars$cyl <- factor(mtcars$cyl)
+describe(mpg, cyl, disp, outcome = am, data = mtcars)
 
 }

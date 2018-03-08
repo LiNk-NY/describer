@@ -28,11 +28,19 @@
 #' data(mtcars)
 #'
 #' meansd(mtcars$mpg)
+#' proportion(mtcars$gear)
 #'
 #' with(mtcars, groupMeans(mpg, am))
 #'
 #' am <- plyr::mapvalues(mtcars$am, c(0, 1), c("Auto", "Manual"))
+#' mtcars$vs1 <- plyr::mapvalues(mtcars$vs, c(0, 1), c("V Engine", "Straight"))
+#'
 #' groupMeans(mtcars$mpg, am)
+#'
+#' crosstab(mtcars$vs1, am)
+#'
+#' mtcars$cyl <- factor(mtcars$cyl)
+#' describe(mpg, cyl, disp, outcome = am, data = mtcars)
 #'
 NULL
 
@@ -82,7 +90,7 @@ groupMeans <- function(var, outcome, digits = 2) {
     varname <- as.character(substitute(var))
     varname <- varname[[length(varname)]]
     stopifnot(S4Vectors::isSingleString(varname))
-    outcome <- as.factor(outcome)
+
     var <- as.numeric(var)
     splitSet <- split(var, outcome)
     ## Enforce levels
@@ -94,7 +102,6 @@ groupMeans <- function(var, outcome, digits = 2) {
         paste0(m, " (", std, ")")
     }, character(1L), x = splitSet)
     resMat <- matrix(res, nrow = 1L, dimnames = list(varname, groupNames))
-    resMat[, rev(groupNames), drop = FALSE]
 }
 
 #' @name describers
@@ -135,9 +142,9 @@ describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
     outlevels <- rownames(contrasts(outcome))
     headrow <- if (includerHeader) {
         list(matrix(
-            c("", paste0("n = ", table(outcome)[outlevels]), ""), nrow = 1L,
+            c("", paste0("n = ", table(outcome)[outlevels])), nrow = 1L,
             dimnames = list("Characteristic", c("n (%)",
-            paste(outname, outlevels, sep = "-"), "p.value"))
+            paste(outname, outlevels, sep = "-")))
         ))
     } else {
         NULL
@@ -151,24 +158,21 @@ describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
         if (is.character(vari))
             vari <- as.factor(vari)
         if (numeric[[i]]) {
-            cbind(.meansd(vari, varName = names(x[i]), digits = digits),
-                  .groupMeans(vari, compVar, digits = digits),
-                  .ttestPval(vari, compVar, varName = names(x[i])))
+            cbind(meansd(vari, varname = names(x[i]), digits = digits),
+                  groupMeans(vari, compVar, digits = digits))
         } else {
-            fourth <- .chitestPval(vari, compVar)[[1L]]
             if (!is.null(headerRow)) {
-                header <- matrix(c(rep("", 3L), fourth), nrow = 1L,
-                                 dimnames = list(headerRow[[i]], NULL))
-                p.value <- rep("", length(levels(vari)))
+                header <- matrix(rep("", 3L), nrow = 1L,
+                    dimnames = list(headerRow[[i]], NULL))
             } else {
                 header <- character(0L)
-                p.value <- c(fourth, rep("", length(levels(vari))-1))
             }
             rbind(header,
-                  cbind(.prop(vari, digits = digits),
-                        .crossTab(vari, compVar, digits = digits),
-                        p.value))
+                  cbind(proportion(vari, digits = digits),
+                        crosstab(vari, compVar, digits = digits))
+            )
         }
     }, compVar = outcome, x = args)
-    c(headrow, results)
+    reslist <- c(headrow, results)
+    do.call(rbind, reslist)
 }
