@@ -5,7 +5,7 @@
 \alias{meansd}
 \alias{nprops}
 \alias{crosstab}
-\alias{groupMeans}
+\alias{gmeans}
 \alias{describe}
 \title{A collection of functions to summarize vectors in matrix format}
 \usage{
@@ -15,7 +15,7 @@ nprops(catvar, digits = 1)
 
 crosstab(var1, var2, digits = 2)
 
-groupMeans(numvar, catvar, digits = 2)
+gmeans(numvar, catvar, digits = 2)
 
 describe(..., outcome, data, headerRow = NULL, headerFrame = NULL,
   includeHeader = TRUE, deparse.level = 2, digits = 2)
@@ -66,12 +66,12 @@ data(mtcars)
 meansd(mtcars$mpg)
 nprops(mtcars$gear)
 
-with(mtcars, groupMeans(mpg, am))
+with(mtcars, gmeans(mpg, am))
 
 am <- plyr::mapvalues(mtcars$am, c(0, 1), c("Auto", "Manual"))
 mtcars$vs1 <- plyr::mapvalues(mtcars$vs, c(0, 1), c("V Engine", "Straight"))
 
-groupMeans(mtcars$mpg, am)
+gmeans(mtcars$mpg, am)
 
 crosstab(mtcars$vs1, am)
 

@@ -2,6 +2,6 @@
 
 export(crosstab)
 export(describe)
-export(groupMeans)
+export(gmeans)
 export(meansd)
 export(nprops)

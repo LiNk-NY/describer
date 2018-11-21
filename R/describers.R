@@ -33,12 +33,12 @@
 #' meansd(mtcars$mpg)
 #' nprops(mtcars$gear)
 #'
-#' with(mtcars, groupMeans(mpg, am))
+#' with(mtcars, gmeans(mpg, am))
 #'
 #' am <- plyr::mapvalues(mtcars$am, c(0, 1), c("Auto", "Manual"))
 #' mtcars$vs1 <- plyr::mapvalues(mtcars$vs, c(0, 1), c("V Engine", "Straight"))
 #'
-#' groupMeans(mtcars$mpg, am)
+#' gmeans(mtcars$mpg, am)
 #'
 #' crosstab(mtcars$vs1, am)
 #'
@@ -89,7 +89,7 @@ crosstab <- function(var1, var2, digits = 2) {
 
 #' @name describers
 #' @export
-groupMeans <- function(numvar, catvar, digits = 2) {
+gmeans <- function(numvar, catvar, digits = 2) {
     varname <- as.character(substitute(numvar))
     varname <- varname[[length(varname)]]
     stopifnot(S4Vectors::isSingleString(varname))
@@ -163,7 +163,7 @@ describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
             vari <- as.factor(vari)
         if (numeric[[i]]) {
             cbind(meansd(vari, varname = names(x[i]), digits = digits),
-                  groupMeans(vari, compVar, digits = digits))
+                  gmeans(vari, compVar, digits = digits))
         } else {
             if (!is.null(headerRow)) {
                 header <- matrix(rep("", 3L), nrow = 1L,
