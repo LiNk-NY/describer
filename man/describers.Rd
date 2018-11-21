@@ -2,31 +2,26 @@
 % Please edit documentation in R/describers.R
 \name{describers}
 \alias{describers}
-\alias{describers}
 \alias{meansd}
-\alias{describers}
-\alias{proportion}
-\alias{describers}
+\alias{nprops}
 \alias{crosstab}
-\alias{describers}
 \alias{groupMeans}
-\alias{describers}
 \alias{describe}
 \title{A collection of functions to summarize vectors in matrix format}
 \usage{
-meansd(var, na.rm = TRUE, varname = NULL, digits = 2)
+meansd(numvar, na.rm = TRUE, varname = NULL, digits = 2)
 
-proportion(var, digits = 1)
+nprops(catvar, digits = 1)
 
-crosstab(var, var2, digits = 2)
+crosstab(var1, var2, digits = 2)
 
-groupMeans(var, outcome, digits = 2)
+groupMeans(numvar, catvar, digits = 2)
 
 describe(..., outcome, data, headerRow = NULL, headerFrame = NULL,
-  includerHeader = TRUE, deparse.level = 2, digits = 2)
+  includeHeader = TRUE, deparse.level = 2, digits = 2)
 }
 \arguments{
-\item{var}{A character or numeric vector}
+\item{numvar}{A numeric vector}
 
 \item{na.rm}{(default TRUE) whether to remove NA values when summarizing
 numeric values}
@@ -36,12 +31,16 @@ numeric values}
 
 \item{digits}{The number of significant digits to show}
 
-\item{var2}{A second categorical variable for crosstabulation}
+\item{catvar}{A factor vector (categorical)}
 
-\item{outcome}{The comparison variable, divides the data into categories}
+\item{var1}{A character or numeric vector}
+
+\item{var2}{A second categorical variable for crosstabulation}
 
 \item{...}{Variables to describe by the outcome, can be verctors or
 unquoted names when the data argument is supplied}
+
+\item{outcome}{The comparison variable, divides the data into categories}
 
 \item{data}{A data.frame containing the comparison variables}
 
@@ -51,8 +50,10 @@ as the descriptive name in the table}
 \item{headerFrame}{A data.frame that relates or maps each variable name
 to its respective descriptive name}
 
-\item{includeHeaders}{logical (default TRUE) indicating whether or not
+\item{includeHeader}{logical (default TRUE) indicating whether or not
 to add a header row to the table with group counts for the outcome variable}
+
+\item{deparse.level}{controls how the default dnn is constructed. See 'table'.}
 }
 \description{
 These functions work on character, numeric, or factor
@@ -63,7 +64,7 @@ vectors. They are meant to make outputs easier to paste into table.
 data(mtcars)
 
 meansd(mtcars$mpg)
-proportion(mtcars$gear)
+nprops(mtcars$gear)
 
 with(mtcars, groupMeans(mpg, am))
 

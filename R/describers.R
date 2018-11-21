@@ -5,8 +5,10 @@
 #' @description These functions work on character, numeric, or factor
 #' vectors. They are meant to make outputs easier to paste into table.
 #'
-#' @param var A character or numeric vector
+#' @param var1 A character or numeric vector
 #' @param var2 A second categorical variable for crosstabulation
+#' @param numvar A numeric vector
+#' @param catvar A factor vector (categorical)
 #' @param na.rm (default TRUE) whether to remove NA values when summarizing
 #' numeric values
 #' @param varname An optional character string for the name of the vector
@@ -20,15 +22,16 @@
 #' as the descriptive name in the table
 #' @param headerFrame A data.frame that relates or maps each variable name
 #' to its respective descriptive name
-#' @param includeHeaders logical (default TRUE) indicating whether or not
+#' @param includeHeader logical (default TRUE) indicating whether or not
 #' to add a header row to the table with group counts for the outcome variable
+#' @param deparse.level controls how the default dnn is constructed. See 'table'.
 #'
 #' @examples
 #'
 #' data(mtcars)
 #'
 #' meansd(mtcars$mpg)
-#' proportion(mtcars$gear)
+#' nprops(mtcars$gear)
 #'
 #' with(mtcars, groupMeans(mpg, am))
 #'
@@ -46,39 +49,39 @@ NULL
 
 #' @name describers
 #' @export
-meansd <- function(var, na.rm = TRUE, varname = NULL, digits = 2) {
+meansd <- function(numvar, na.rm = TRUE, varname = NULL, digits = 2) {
     if (is.null(varname)) {
-    varname <- as.character(substitute(var))
-    varname <- varname[[length(varname)]]
+        varname <- as.character(substitute(numvar))
+        varname <- varname[[length(varname)]]
     }
     stopifnot(S4Vectors::isSingleString(varname))
-    var <- as.numeric(var)
-    m <- round(mean(var, na.rm = na.rm), digits)
-    stddev <- round(sd(var, na.rm = na.rm), digits)
+    numvar <- as.numeric(numvar)
+    m <- round(mean(numvar, na.rm = na.rm), digits)
+    stddev <- round(stats::sd(numvar, na.rm = na.rm), digits)
     matrix(paste0(m, " (", stddev, ")"), ncol = 1L,
         dimnames = list(varname, "M (SD)"))
 }
 
 #' @name describers
 #' @export
-proportion <- function(var, digits = 1) {
-    if (is.data.frame(var))
-        var <- var[[1L]]
-    counts <- table(var)
-    props <- round(prop.table(table(var))*100, digits)
+nprops <- function(catvar, digits = 1) {
+    if (is.data.frame(catvar))
+        catvar <- catvar[[1L]]
+    counts <- table(catvar)
+    props <- round(prop.table(table(catvar))*100, digits)
     vals <- paste0(counts, " (", props, ")")
-    matrix(vals, ncol = 1, dimnames = list(names(table(var)), "n (%)"))
+    matrix(vals, ncol = 1, dimnames = list(names(table(catvar)), "n (%)"))
 }
 
 #' @name describers
 #' @export
-crosstab <- function(var, var2, digits = 2) {
-    if (is.data.frame(var))
-        var <- var[[1L]]
+crosstab <- function(var1, var2, digits = 2) {
+    if (is.data.frame(var1))
+        var1 <- var1[[1L]]
     if (is.data.frame(var2))
         var2 <- var2[[1L]]
-    counts <- table(var, var2)
-    props <- round(prop.table(table(var, var2), 1L)*100, digits)
+    counts <- table(var1, var2)
+    props <- round(prop.table(table(var1, var2), 1L)*100, digits)
     crossnames <- dimnames(counts)
     vals <- paste0(counts, " (", props, ")")
     matrix(vals, ncol = 2, dimnames = crossnames)
@@ -86,20 +89,20 @@ crosstab <- function(var, var2, digits = 2) {
 
 #' @name describers
 #' @export
-groupMeans <- function(var, outcome, digits = 2) {
-    varname <- as.character(substitute(var))
+groupMeans <- function(numvar, catvar, digits = 2) {
+    varname <- as.character(substitute(numvar))
     varname <- varname[[length(varname)]]
     stopifnot(S4Vectors::isSingleString(varname))
-    outcome <- as.factor(outcome)
+    catvar <- as.factor(catvar)
 
-    var <- as.numeric(var)
-    splitSet <- split(var, outcome)
+    numvar <- as.numeric(numvar)
+    splitSet <- split(numvar, catvar)
     ## Enforce levels
-    splitSet <- splitSet[levels(outcome)]
+    splitSet <- splitSet[levels(catvar)]
     groupNames <- names(splitSet)
     res <- vapply(seq_along(splitSet), function(i, x) {
         m <- round(mean(x[[i]], na.rm = TRUE), digits)
-        std <- round(sd(x[[i]], na.rm = TRUE), digits)
+        std <- round(stats::sd(x[[i]], na.rm = TRUE), digits)
         paste0(m, " (", std, ")")
     }, character(1L), x = splitSet)
     matrix(res, nrow = 1L, dimnames = list(varname, groupNames))
@@ -108,7 +111,7 @@ groupMeans <- function(var, outcome, digits = 2) {
 #' @name describers
 #' @export
 describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
-    includerHeader = TRUE, deparse.level = 2, digits = 2)
+    includeHeader = TRUE, deparse.level = 2, digits = 2)
 {
     listvars <- as.list(substitute(list(...)))[-1L]
     ## code from table()
@@ -140,8 +143,8 @@ describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
     else
         names(lengthArgs) <- names(args) <- nams
 
-    outlevels <- rownames(contrasts(outcome))
-    headrow <- if (includerHeader) {
+    outlevels <- rownames(stats::contrasts(outcome))
+    headrow <- if (includeHeader) {
         list(matrix(
             c("", paste0("n = ", table(outcome)[outlevels])), nrow = 1L,
             dimnames = list("Characteristic", c("n (%)",
@@ -169,8 +172,8 @@ describe <- function(..., outcome, data, headerRow = NULL, headerFrame = NULL,
                 header <- character(0L)
             }
             rbind(header,
-                  cbind(proportion(vari, digits = digits),
-                        crosstab(vari, compVar, digits = digits))
+                cbind(nprops(vari, digits = digits),
+                    crosstab(vari, compVar, digits = digits))
             )
         }
     }, compVar = outcome, x = args)
