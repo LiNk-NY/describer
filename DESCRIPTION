@@ -7,7 +7,6 @@ Description: The describer package produces crosstabs, mean tables,
     proportions for vector data.
 Depends: R (>= 3.5.0)
 Imports:
-  S4Vectors,
   stats
 Suggests:
   plyr

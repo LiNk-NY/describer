@@ -1,3 +1,8 @@
+.isSingleString <- function(x) {
+    ## from S4Vectors::isSingleString
+    is.character(x) && length(x) == 1L && !is.na(x)
+}
+
 #' @name describers
 #'
 #' @title A collection of functions to summarize vectors in matrix format
@@ -54,7 +59,7 @@ meansd <- function(numvar, na.rm = TRUE, varname = NULL, digits = 2) {
         varname <- as.character(substitute(numvar))
         varname <- varname[[length(varname)]]
     }
-    stopifnot(S4Vectors::isSingleString(varname))
+    stopifnot(.isSingleString(varname))
     numvar <- as.numeric(numvar)
     m <- round(mean(numvar, na.rm = na.rm), digits)
     stddev <- round(stats::sd(numvar, na.rm = na.rm), digits)
@@ -92,7 +97,7 @@ crosstab <- function(var1, var2, digits = 2) {
 gmeans <- function(numvar, catvar, digits = 2) {
     varname <- as.character(substitute(numvar))
     varname <- varname[[length(varname)]]
-    stopifnot(S4Vectors::isSingleString(varname))
+    stopifnot(.isSingleString(varname))
     catvar <- as.factor(catvar)
 
     numvar <- as.numeric(numvar)
