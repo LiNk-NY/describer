@@ -89,7 +89,7 @@ crosstab <- function(var1, var2, digits = 2) {
     props <- round(prop.table(table(var1, var2), 1L)*100, digits)
     crossnames <- dimnames(counts)
     vals <- paste0(counts, " (", props, ")")
-    matrix(vals, ncol = 2, dimnames = crossnames)
+    matrix(vals, ncol = length(unique(var2)), dimnames = crossnames)
 }
 
 #' @name describers
